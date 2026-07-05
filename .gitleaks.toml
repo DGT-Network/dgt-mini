@@ -1,0 +1,13 @@
+# gitleaks configuration — extends the default ruleset.
+# Only pinpoint false-positive allowlists live here; never allowlist whole files
+# or directories without a written justification.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known false positives"
+regexes = [
+  # signing/dgt_signing/secp256k1.py: private-key *class* plumbing, not a secret value
+  '''self\._private_key = secp256k1_private_key''',
+]

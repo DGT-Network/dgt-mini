@@ -14,4 +14,4 @@ jobs:
       - name: Run gitleaks (full history)
         run: |
           curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar -xz gitleaks
-          ./gitleaks detect --source . --no-banner --redact -v
+          ./gitleaks detect --source . --config .gitleaks.toml --no-banner --redact -v
