@@ -1,0 +1,20 @@
+{
+  "clients" : {
+      "clientDgt": ["status", "calendar","state","show","trans","admin"],
+      "clientC": ["calendar","mail","show","trans","admin"]
+  },
+  "users":  {
+      "example-user" : "CHANGE-ME"
+  },
+  "token" : {
+      "token_expires_in" : 7776000
+  },
+  "rest" : {
+      "endpoints" : {
+            "/token_list": ["admin"],
+            "/del_token" : ["admin"],
+            "*"          : ["show","trans"]
+      },
+      "create_token" : "/token"
+  }
+}

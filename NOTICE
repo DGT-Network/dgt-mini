@@ -1,0 +1,11 @@
+dgt-mini
+Copyright 2026 DGT Network, Inc.
+
+This product is a derivative work of DGT-ATHABASCA
+(https://github.com/DGT-Network/DGT-ATHABASCA),
+Copyright DGT NETWORK INC, licensed under the Apache License, Version 2.0.
+
+DGT-ATHABASCA is itself derived from Hyperledger Sawtooth
+(https://github.com/hyperledger/sawtooth-core),
+Copyright Intel Corporation and contributors,
+licensed under the Apache License, Version 2.0.
