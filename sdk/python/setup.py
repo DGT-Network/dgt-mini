@@ -46,11 +46,13 @@ setup(
     url='https://github.com/hyperledger/sawtooth-core',
     packages=find_packages(),
     data_files=data_files,
+    python_requires=">=3.10",
     install_requires=[
         "colorlog",
         "sawtooth-signing",
-        "protobuf",
-        "pyzmq",
+        "protobuf>=4.25.1,<6",
+        "pyzmq>=25",
         "toml",
-        "PyYAML",
+        "PyYAML>=6.0",
+        "requests>=2.31",
     ])

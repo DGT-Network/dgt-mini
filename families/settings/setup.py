@@ -42,9 +42,10 @@ setup(
     author='DGT',
     url='https://github.com/hyperledger/bgx',
     packages=find_packages(),
+    python_requires=">=3.10",
     install_requires=[
         'colorlog',
-        'protobuf',
+        'protobuf>=4.25.1,<6',
         'sawtooth-sdk',
     ],
     data_files=data_files,

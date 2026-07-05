@@ -40,14 +40,15 @@ setup(
     author='Hyperledger Sawtooth-dgt',
     url='https://github.com/hyperledger/sawtooth-core',
     packages=find_packages(),
+    python_requires=">=3.10",
     install_requires=[
         "cbor",
         "colorlog",
-        "cryptography",
+        "cryptography>=41",
+        "lmdb>=1.4",
         "sawtooth-sdk",
         "sawtooth-signing",
-        "toml",
-        "cbor"
+        "toml"
     ],
     data_files=data_files,
     entry_points={

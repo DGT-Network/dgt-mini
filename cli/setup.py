@@ -33,9 +33,10 @@ setup(
     author='NTRLab',
     url='http://gitlab.ntrlab.ru:83/ntrlab/bgx',
     packages=find_packages(),
+    python_requires=">=3.10",
     install_requires=[
-        'colorlog', 'protobuf', 'sawtooth-signing', 'toml', 'PyYAML',
-        'requests'
+        'colorlog', 'protobuf>=4.25.1,<6', 'sawtooth-signing', 'toml',
+        'PyYAML>=6.0', 'requests>=2.31'
     ],
     data_files=data_files,
     entry_points={

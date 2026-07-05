@@ -26,8 +26,10 @@ setup(
     author='Hyperledger Sawtooth',
     url='https://github.com/hyperledger/sawtooth-core',
     packages=find_packages(),
+    python_requires=">=3.10",
     install_requires=[
         "secp256k1",
+        "cryptography>=41",
     ],
     data_files=[],
     entry_points={})

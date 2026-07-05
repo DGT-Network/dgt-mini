@@ -201,15 +201,14 @@ class _SendReceive(object):
                 self._received_message_counters[tag] = CounterWrapper()
         return self._received_message_counters[tag]
 
-    @asyncio.coroutine
-    def _do_heartbeat(self):
+    async def _do_heartbeat(self):
         while True:
             try:
                 if self._socket.getsockopt(zmq.TYPE) == zmq.ROUTER:
-                    yield from self._do_router_heartbeat()
+                    await self._do_router_heartbeat()
                 elif self._socket.getsockopt(zmq.TYPE) == zmq.DEALER:
-                    yield from self._do_dealer_heartbeat()
-                yield from asyncio.sleep(self._heartbeat_interval)
+                    await self._do_dealer_heartbeat()
+                await asyncio.sleep(self._heartbeat_interval)
             except CancelledError:
                 # The concurrent.futures.CancelledError is caught by asyncio
                 # when the Task associated with the coroutine is cancelled.
@@ -218,8 +217,7 @@ class _SendReceive(object):
             except Exception as e:  # pylint: disable=broad-except
                 LOGGER.exception("An error occurred while sending heartbeat: %s", e)
 
-    @asyncio.coroutine
-    def _do_router_heartbeat(self):
+    async def _do_router_heartbeat(self):
         check_time = time.time()
         expired = \
             [(ident, check_time - timestamp)
@@ -254,16 +252,15 @@ class _SendReceive(object):
                     bytes(zmq_identity),
                     message.SerializeToString()
                 ]
-                yield from self._send_message_frame(message_frame)
+                await self._send_message_frame(message_frame)
 
-    @asyncio.coroutine
-    def _do_dealer_heartbeat(self):
+    async def _do_dealer_heartbeat(self):
         if self._last_message_time and self._is_connection_lost(self._last_message_time):
             LOGGER.info("No response from %s in %s seconds - removing connection.",self._connection,self._last_message_time)
             connection_id = hashlib.sha512(self.connection.encode()).hexdigest()
             if connection_id in self._connections:
                 del self._connections[connection_id]
-            yield from self._stop()
+            await self._stop()
 
     def remove_connected_identity(self, zmq_identity):
         if zmq_identity in self._last_message_times:
@@ -281,8 +278,7 @@ class _SendReceive(object):
             self._connections[connection_id] = ConnectionInfo(ConnectionType.ZMQ_IDENTITY,zmq_identity,None,None,None,False)
             LOGGER.info("RECEIVED CONN=%s from identity=%s total=%s",connection_id[:8],zmq_identity,len(self._connections))
 
-    @asyncio.coroutine
-    def _dispatch_message(self):
+    async def _dispatch_message(self):
         while True:
             try:
                 queue_size = self._dispatcher_queue.qsize()
@@ -290,7 +286,7 @@ class _SendReceive(object):
                     LOGGER.debug("Dispatch queue size: %s", queue_size)
 
                 zmq_identity, msg_bytes = \
-                    yield from self._dispatcher_queue.get()
+                    await self._dispatcher_queue.get()
                 self._get_queue_size_gauge(self.connection).set_value(queue_size)
                 message = validator_pb2.Message()
                 message.ParseFromString(msg_bytes)
@@ -329,8 +325,7 @@ class _SendReceive(object):
             except Exception as e:  # pylint: disable=broad-except
                 LOGGER.exception("Received a message on address %s that caused an error: %s", self._address, e)
 
-    @asyncio.coroutine
-    def _receive_message(self):
+    async def _receive_message(self):
         """
         Internal coroutine for receiving messages
         """
@@ -339,12 +334,12 @@ class _SendReceive(object):
             try:
                 if self._socket.getsockopt(zmq.TYPE) == zmq.ROUTER:
                     zmq_identity, msg_bytes = \
-                        yield from self._socket.recv_multipart()
+                        await self._socket.recv_multipart()
                     self._received_from_identity(zmq_identity)
                     self._dispatcher_queue.put_nowait(
                         (zmq_identity, msg_bytes))
                 else:
-                    msg_bytes = yield from self._socket.recv()
+                    msg_bytes = await self._socket.recv()
                     #LOGGER.exception("Received a message=%s",msg_bytes)
                     self._last_message_time = time.time()
                     self._dispatcher_queue.put_nowait((None, msg_bytes))
@@ -359,9 +354,8 @@ class _SendReceive(object):
 
         LOGGER.debug("Receive message DONE")
 
-    @asyncio.coroutine
-    def _send_message_frame(self, message_frame):
-        yield from self._socket.send_multipart(message_frame)
+    async def _send_message_frame(self, message_frame):
+        await self._socket.send_multipart(message_frame)
 
     def send_message(self, msg, connection_id=None):
         """
@@ -392,8 +386,7 @@ class _SendReceive(object):
             # the eventloop is closed. This occurs on shutdown.
             pass
 
-    @asyncio.coroutine
-    def _send_last_message(self, identity, msg):
+    async def _send_last_message(self, identity, msg):
         LOGGER.debug("%s sending last message %s to %s",
                      self._connection,
                      get_enum_name(msg.message_type),
@@ -405,7 +398,7 @@ class _SendReceive(object):
             message_bundle = [bytes(identity),
                               msg.SerializeToString()]
 
-        yield from self._socket.send_multipart(message_bundle)
+        await self._socket.send_multipart(message_bundle)
         if identity is None:
             if self._connection != "ServerThread":
                 self.shutdown()
@@ -460,7 +453,7 @@ class _SendReceive(object):
                         self._server_private_key is None:
                     raise LocalConfigurationError("Attempting to start socket in secure mode, but complete server keys were not provided")
 
-            self._event_loop = zmq.asyncio.ZMQEventLoop()
+            self._event_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._event_loop)
             self._context = zmq.asyncio.Context()
             self._socket = self._context.socket(socket_type)
@@ -546,11 +539,10 @@ class _SendReceive(object):
             self._monitor_sock.close(linger=0)
         self._context.destroy(linger=0)
 
-    @asyncio.coroutine
-    def _monitor_disconnects(self):
+    async def _monitor_disconnects(self):
         while True:
             try:
-                yield from self._monitor_sock.recv_multipart()
+                await self._monitor_sock.recv_multipart()
                 if self._check_connections is not None:
                     self._check_connections()
             except CancelledError:
@@ -564,20 +556,17 @@ class _SendReceive(object):
     def set_check_connections(self, function):
         self._check_connections = function
 
-    @asyncio.coroutine
-    def _stop_auth(self):
+    async def _stop_auth(self):
         if self._auth is not None:
             self._auth.stop()
 
-    @asyncio.coroutine
-    def _stop_event_loop(self):
+    async def _stop_event_loop(self):
         self._event_loop.stop()
 
-    @asyncio.coroutine
-    def _stop(self):
+    async def _stop(self):
         self._dispatcher.remove_send_message(self._connection)
         self._dispatcher.remove_send_last_message(self._connection)
-        yield from self._stop_auth()
+        await self._stop_auth()
 
         tasks = list(asyncio.all_tasks(self._event_loop).copy()) if is_new_async else list(asyncio.Task.all_tasks(self._event_loop).copy())
         for task in tasks:
@@ -585,8 +574,7 @@ class _SendReceive(object):
 
         asyncio.ensure_future(self._stop_event_loop())
 
-    @asyncio.coroutine
-    def _notify_started(self):
+    async def _notify_started(self):
         self._ready.set()
 
     def shutdown(self):

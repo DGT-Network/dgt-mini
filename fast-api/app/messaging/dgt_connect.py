@@ -18,10 +18,11 @@ import sys
 import asyncio
 from app.core.config import settings
 from app.utils.logger import logger as LOGGER
-from zmq.asyncio import ZMQEventLoop
 #from .messaging  import Connection
 
-zmq_loop = ZMQEventLoop()
+# The dedicated zmq asyncio event loop class was removed in pyzmq 22;
+# zmq.asyncio.Context works on the standard asyncio event loop since pyzmq 17.
+zmq_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(zmq_loop)
 
 #connection = Connection(settings.DGT_CONNECT)

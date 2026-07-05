@@ -56,7 +56,8 @@ class WorkloadGenerator:
 
         self._rate = 1.0 / int(args.rate)
         self._display_frequency = args.display_frequency
-        self.loop = asyncio.get_event_loop()
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
         self.thread_pool = ThreadPoolExecutor(10)
         asyncio.ensure_future(self._simulator_loop(), loop=self.loop)
 
@@ -71,10 +72,9 @@ class WorkloadGenerator:
         self._time_since_last_check = time.time()
         self.loop.run_forever()
 
-    @asyncio.coroutine
-    def _simulator_loop(self):
+    async def _simulator_loop(self):
         while True:
-            yield from asyncio.sleep(self._rate)
+            await asyncio.sleep(self._rate)
             with self._lock:
                 now = time.time()
                 delta = now - self._time_since_last_check
@@ -127,7 +127,7 @@ class WorkloadGenerator:
                     self.thread_pool, self._check_on_batch, batch)
 
     def stop(self):
-        tasks = list(asyncio.Task.all_tasks(self.loop))
+        tasks = list(asyncio.all_tasks(self.loop))
         for task in tasks:
             self.loop.call_soon_threadsafe(task.cancel)
         try:

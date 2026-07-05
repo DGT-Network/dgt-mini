@@ -31,12 +31,15 @@ setup(
     author='DGT NETWORK INC © Stanislav Parsov',
     url='https://github.com/hyperledger/sawtooth-core',
     packages=find_packages(),
+    python_requires=">=3.10",
     install_requires=[
         "cbor",
         "colorlog",
         "dgt-sdk",
         "dgt-signing",
-        "secp256k1"
+        "secp256k1",
+        "requests>=2.31",
+        "PyYAML>=6.0"
     ],
     data_files=data_files,
     entry_points={

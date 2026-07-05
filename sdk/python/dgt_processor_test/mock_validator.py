@@ -76,7 +76,7 @@ class MockValidator:
         """
         self._url = url
 
-        self._loop = zmq.asyncio.ZMQEventLoop()
+        self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
 
         self._context = zmq.asyncio.Context()
