@@ -313,7 +313,7 @@ class Gossip(object):
         LOGGER.debug(f"Gossip: REAL SEEDS={self._initial_seed_endpoints}")
 
     def _peers_control_init(self):
-        plist = os.environ.get('PCONTROL')
+        plist = os.environ.get('PCONTROL') or ''
         self._pcontrol = plist != ''
         self._pfifo = None
         self._peers_ctrl = []

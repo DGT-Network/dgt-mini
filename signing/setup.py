@@ -30,6 +30,7 @@ setup(
     install_requires=[
         "secp256k1",
         "cryptography>=41",
+        "pycryptodome>=3.19",
     ],
     data_files=[],
     entry_points={})

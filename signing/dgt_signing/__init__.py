@@ -20,7 +20,25 @@ from dgt_signing.core import SigningError
 from dgt_signing.secp256k1 import Secp256k1Context
 from dgt_signing.open_crypto import OpenCryptoContext
 
-from sha3 import keccak_256
+try:
+    from sha3 import keccak_256  # pysha3 / safe-pysha3 (legacy)
+except ImportError:
+    # pysha3 is unmaintained and does not build on modern Python;
+    # pycryptodome (BSD-2) provides the same pre-NIST Keccak-256.
+    from Crypto.Hash import keccak as _keccak
+
+    class keccak_256:
+        def __init__(self, data=b""):
+            self._h = _keccak.new(digest_bits=256)
+            if data:
+                self._h.update(data)
+        def update(self, data):
+            self._h.update(data)
+            return self
+        def digest(self):
+            return self._h.digest()
+        def hexdigest(self):
+            return self._h.hexdigest()
 import hashlib
 
 DGT_CRYPTO_NM = 'dgt.crypto'
@@ -172,7 +190,10 @@ class CryptoFactory:
         return Signer(self._context, private_key)
 
 
-def create_context(algorithm_name,backend='bitcoin'):
+def create_context(algorithm_name, backend=None):
+    # backend precedence: explicit arg > DGT_CRYPTO_BACK env > 'bitcoin' (legacy default)
+    if backend is None:
+        backend = os.environ.get('DGT_CRYPTO_BACK', 'bitcoin')
     """Returns an algorithm instance by name.
 
     Args:
