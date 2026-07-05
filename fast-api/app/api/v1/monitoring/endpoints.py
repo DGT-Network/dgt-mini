@@ -34,14 +34,8 @@ async def get_metrics_tps(request: Request,trange:str = "24h",tgroup:str = "2m",
     #LOGGER.debug("QUERY {}".format(squery))
     results = []
     try:
-        if True:
-            result = client.query(squery)
-            results = list(result.get_points())
-        else:
-            tables = query_api.query(squery) #, org=org)
-            for table in tables:
-                for record in table.records:
-                    results.append((record.get_field(), record.get_value()))
+        result = client.query(squery)
+        results = list(result.get_points())
                     
     except Exception as ex:
         LOGGER.debug("get get data {}".format(ex))

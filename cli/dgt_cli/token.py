@@ -29,7 +29,7 @@ def load_json(cname):
             
             return conf
         except Exception as ex:   
-            print(f"CANT GET CONF FROM={name} ({ex})")                                        
+            print(f"CANT GET CONF FROM={cname} ({ex})")                                        
             return None
 
 def add_token_parser(subparsers, parent_parser):

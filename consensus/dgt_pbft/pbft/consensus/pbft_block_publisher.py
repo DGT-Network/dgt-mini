@@ -450,7 +450,7 @@ class PbftBlockPublisher(BlockPublisherInterface):
             # Check if we need to give up on this registration attempt
             self._handle_registration_timeout(
                 block_header=block_header,
-                pbft_enclave_module=pbft_enclave_module,
+                pbft_enclave_module=None,  # not in scope; enclave removed in DGT fork
                 state_view=state_view,
                 signup_nonce=pbft_key_state.signup_nonce,
                 pbft_public_key=active_pbft_public_key

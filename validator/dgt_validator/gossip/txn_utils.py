@@ -23,6 +23,11 @@ import random
 import time
 import cbor
 
+LOGGER = logging.getLogger(__name__)
+
+def _sha512(data):
+    return hashlib.sha512(data).hexdigest()
+
 from dgt_validator.protobuf.settings_pb2 import SettingsPayload
 from dgt_validator.protobuf.settings_pb2 import SettingProposal
 from dgt_validator.protobuf.settings_pb2 import SettingVote

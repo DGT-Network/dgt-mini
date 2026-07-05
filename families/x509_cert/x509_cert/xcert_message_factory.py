@@ -25,7 +25,7 @@ class XcertMessageFactory:
         self._factory = MessageFactory(
             family_name='xcert',
             family_version='1.0',
-            namespace=INTKEY_ADDRESS_PREFIX,
+            namespace=XCERT_ADDRESS_PREFIX,
             signer=signer)
 
     def _dumps(self, obj):

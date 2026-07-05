@@ -104,7 +104,7 @@ class SettingsTransactionHandler(TransactionHandler):
                           setting_proposal.value)
 
         if approval_threshold > 1:
-            setting_candidates = _get_setting_candidates(context)
+            setting_candidates = self._get_setting_candidates(context)
 
             existing_candidate = _first(
                 setting_candidates.candidates,

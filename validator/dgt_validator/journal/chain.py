@@ -1645,8 +1645,8 @@ class ChainController(object):
 
                 if self._block_manager:
                     # add NEW blkw into block manager 
-                    LOGGER.debug("ChainController: _set_genesis ADD NEW BLOCK=%s\n",type(blkw))
-                    blk = blkw.get_block()
+                    LOGGER.debug("ChainController: _set_genesis ADD NEW BLOCK=%s\n",type(block))
+                    blk = block.get_block()
                     self._block_manager.put([blk]) # set ref=1
                     # self._block_manager.ref_block(blk.header_signature)
 

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Union
 from jose import jwt
 from app.db  import TokenDatabase, get_token_db
-from jose.exceptions import ExpiredSignatureError
+from jose.exceptions import ExpiredSignatureError, JWTError
 from app.utils.logger import logger as LOGGER
 import os
 import secrets

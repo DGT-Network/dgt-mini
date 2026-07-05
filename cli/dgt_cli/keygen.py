@@ -162,7 +162,7 @@ def _read_signer(key_filename,backend='bitcoin'):
     try:
         private_key = context.from_hex(signing_key)
     except ParseError as e:
-        raise CliException(f'Unable to read /{crypto}/ key in file={filename}: {e}')
+        raise CliException(f'Unable to read /{backend}/ key in file={filename}: {e}')
 
 
     crypto_factory = CryptoFactory(context)

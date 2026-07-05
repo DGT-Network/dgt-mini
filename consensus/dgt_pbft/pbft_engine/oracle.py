@@ -354,7 +354,7 @@ class PbftOracle:
     def verify_block(self, block):
         LOGGER.debug('PbftOracle:verify_block...')
         
-        verifier = PbfBlockVerifier(
+        verifier = PbftBlockVerifier(
             block_cache=self._block_cache,
             state_view_factory=self._state_view_factory,
             data_dir=self._data_dir,
